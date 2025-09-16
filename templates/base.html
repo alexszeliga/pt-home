@@ -8,10 +8,17 @@
     <body>
         {% block content %}{% endblock %}
     </body>
-    {% if user.is_authenticated %}
-        <form action="{% url 'logout' %}" method="POST">
-            {% csrf_token %}
-            <button type="submit" class="btn">Logout</button>
-        </form>
-    {% endif %}
+    <footer>
+        {% if user.is_authenticated %}
+        <ul class="list">
+            <a href="{% url 'home' %}" class="link list-row w-full">home</a>
+            <a href="{% url 'profile' %}" class="link list-row w-full">profile</a>
+            <form action="{% url 'logout' %}" method="POST">
+                {% csrf_token %}
+                <button type="submit" class="link list-row w-full">Logout</button>
+            </form>
+        </ul>
+
+        {% endif %}
+    </footer>
 </html>
