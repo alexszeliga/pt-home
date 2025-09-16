@@ -43,7 +43,13 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django_redis',
     'users',
+    'tailwind',
+    'theme',
+    'widget_tweaks',
 ]
+
+if DEBUG:
+    INSTALLED_APPS += ['django_browser_reload']
 
 CACHES = {
     "default": {
@@ -67,6 +73,10 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+if DEBUG:
+    MIDDLEWARE += [
+        "django_browser_reload.middleware.BrowserReloadMiddleware",
+    ]
 
 ROOT_URLCONF = 'pthome.urls'
 
@@ -85,6 +95,8 @@ TEMPLATES = [
         },
     },
 ]
+
+TAILWIND_APP_NAME = 'theme'
 
 WSGI_APPLICATION = 'pthome.wsgi.application'
 
