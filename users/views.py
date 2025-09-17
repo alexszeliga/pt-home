@@ -2,6 +2,7 @@ from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
 from django.shortcuts import render, redirect
+from . import forms
 
 def register(request):
     if request.method == 'POST':
@@ -34,3 +35,8 @@ def login(request):
 @login_required
 def profile(request):
     return render(request, 'users/profile.html', {'user': request.user})
+
+@login_required
+def locations(request):
+    form = forms.LocationForm()
+    return render(request, 'users/locations.html', {'user': request.user, 'form': form})

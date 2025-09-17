@@ -1,12 +1,9 @@
 from django import forms
-from django.contrib.auth.forms import UserCreationForm
 
-class RegisterForm(UserCreationForm):
-    # email = forms.EmailField(required=True) # Example of adding an extra field
-
-    # class Meta(UserCreationForm.Meta):
-    #     fields = UserCreationForm.Meta.fields + ('email',)
-    
-    def clean(self):
-        cleaned_data = super().clean()
-        return cleaned_data
+class LocationForm(forms.Form):
+    name = forms.CharField(max_length=255)
+    address = forms.CharField(max_length=255)
+    place_id = forms.CharField(max_length=255)
+    latitude = forms.DecimalField(max_digits=9, decimal_places=6)
+    longitude = forms.DecimalField(max_digits=9, decimal_places=6)
+    display_name = forms.CharField(max_length=255)
