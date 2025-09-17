@@ -2,6 +2,8 @@
 
 {% load widget_tweaks %}
 
+{% block title %}Login Page{% endblock %}
+
 {% block content %}
     {% if not user.is_authenticated %}
         <form method="post">
@@ -14,7 +16,7 @@
                 <legend class="fieldset-legend">Password</legend>
                 {% render_field form.password class="input" %}
             </fieldset>
-            <button type="submit">Log In</button>
+            <button type="submit" class="btn btn-primary">Log In</button>
         </form>
         <a href="{% url 'register' %}" class="link">Register</a>
     {% endif %}

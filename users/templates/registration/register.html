@@ -2,10 +2,21 @@
 
 {% load widget_tweaks %}
 
+{% block title %}Registration{% endblock %}
+
 {% block content %}
     <form method="post">
         {% csrf_token %}
-        {{ form }}
+        {% for field in form %}
+        <fieldset class="fieldset">
+            {{ field.label_tag }}
+            {% render_field field class="input" %}
+            {% for error in field.errors %}
+            <small class="text-danger">{{ error }}</small>
+            {% endfor %}
+            <small class="form-text text-muted">{{ field.help_text }}</small>
+        </fieldset>
+        {% endfor %}
         <button type="submit">Register</button>
     </form>
 {% endblock %}

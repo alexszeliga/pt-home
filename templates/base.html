@@ -1,12 +1,15 @@
 {% load static tailwind_tags %}
 <html>
     <head>
-        <title>{% block title %}PT Home{% endblock %}</title>
+        <title>PT Home -- {% block title %}{% endblock %}</title>
         {% block head_scripts %}{% endblock %}
         {% tailwind_css %}
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     </head>
-    <body>
-        {% block content %}{% endblock %}
+    <body class="">
+        <div class="container mx-auto">
+            {% block content %}{% endblock %}
+        </div>
     </body>
     <footer>
         {% if user.is_authenticated %}

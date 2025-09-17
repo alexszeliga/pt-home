@@ -1,17 +1,17 @@
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.forms import AuthenticationForm
+from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
 from django.shortcuts import render, redirect
-from .forms import RegisterForm
 
 def register(request):
     if request.method == 'POST':
-        form = RegisterForm(request)
+        form = UserCreationForm(request.POST)
+        print(type(form))
         if form.is_valid():
             form.save()
             return redirect('login') # Redirect to login page after successful registration
     else:
-        form = RegisterForm()
+        form = UserCreationForm()
     return render(request, 'registration/register.html', {'form': form})
 
 def login(request):

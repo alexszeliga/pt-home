@@ -1,5 +1,7 @@
 @import "tailwindcss";
-@plugin "daisyui";
+@plugin "daisyui" {
+  themes: emerald --default, dim --prefersdark;
+}
 
 /**
   * A catch-all path to Django template files, JavaScript, and Python files
