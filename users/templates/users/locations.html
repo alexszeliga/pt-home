@@ -1,7 +1,9 @@
 {% extends 'base.html' %}
 
-{% block title %}Add Location{% endblock %}
+{% block title %}User Locations{% endblock %}
 
 {% block content %}
-    {{ form }}
+{% for userLocation in userLocations %}
+<p>{{ userLocation }}</p>
+{% endfor %}
 {% endblock %}
