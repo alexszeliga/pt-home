@@ -3,7 +3,6 @@ from django.db import models
 from django.conf import settings
 
 class Location(locationModels.Model):
-    name = locationModels.CharField(max_length=255)
     address = locationModels.CharField(max_length=255)
     location = locationModels.PointField(blank=True, null=True)
     place_id = locationModels.CharField(max_length=255, unique=True, db_index=True)
