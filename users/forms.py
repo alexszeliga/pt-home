@@ -8,7 +8,13 @@ class LocationForm(forms.Form):
         self.user = kwargs.pop('user', None) 
         super().__init__(*args, **kwargs)
 
+    walking_choices = [
+        ('0.1', '0.1 miles'),
+        ('0.5', '0.5 miles'),
+        ('1', '1 mile'),
+    ]
     name = forms.CharField(max_length=255,required=False)
+    walking_distance = forms.ChoiceField(choices=walking_choices,initial='0.5')
     address = forms.CharField(max_length=255,widget=forms.HiddenInput())
     place_id = forms.CharField(max_length=255,widget=forms.HiddenInput())
     latitude = forms.DecimalField(max_digits=9, decimal_places=6,widget=forms.HiddenInput())
