@@ -1,57 +1,52 @@
 {% load static tailwind_tags %}
 <html>
-    <head>
-        <title>PT Home -- {% block title %}{% endblock %}</title>
-        {% block head_scripts %}{% endblock %}
-        {% tailwind_css %}
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    </head>
-    <body>
-        <div class="navbar bg-base-100 shadow-sm">
-            <div class="navbar-start">
-                <div class="dropdown">
-                    <div tabindex="0" role="button" class="btn btn-ghost btn-circle">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"> <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h7" /> </svg>
-                    </div>
-                    <ul tabindex="0" class="menu menu-sm dropdown-content bg-base-100 rounded-box z-1 mt-3 w-52 p-s shadow">
-                        <li><a href="{% url 'home' %}" class="">Home</a></li>
-                        <li>
-                            <details>
-                                <summary>My Stuff</summary>
-                                <ul class="bg-base-100 rounded-t-none p-2">
-                                    <li><a href="{% url 'user.locations' %}">List Locations</a></li>
-                                    <li><a href="{% url 'user.add.location' %}">Add Location</a></li>
-                                    <li><a href="{% url 'profile' %}">My Profile</a></li>
-                                </ul>
-                            </details>
-                        </li>
-                        <li><form action="{% url 'logout' %}" method="POST">
+
+<head>
+    <title>PT Home -- {% block title %}{% endblock %}</title>
+    {% block head_scripts %}{% endblock %}
+    {% tailwind_css %}
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+</head>
+
+<body>
+    <div class="navbar bg-base-300 shadow-sm">
+        <div class="navbar-start">
+            <div class="dropdown">
+                <div tabindex="0" role="button" class="btn btn-ghost btn-circle">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M4 6h16M4 12h16M4 18h7" />
+                    </svg>
+                </div>
+                <ul tabindex="0" class="menu menu-sm dropdown-content bg-base-300 rounded-box z-1 mt-3 w-52 p-s shadow">
+
+                    <li><a href="{% url 'home' %}" class="">Home</a></li>
+                    <li><a href="{% url 'user.locations' %}">List Locations</a></li>
+                    <li><a href="{% url 'user.add.location' %}">Add Location</a></li>
+                    <li><a href="{% url 'profile' %}">My Profile</a></li>
+                    <li>
+                        <form action="{% url 'logout' %}" method="POST">
                             {% csrf_token %}
                             <button type="submit" class="">Logout</button>
-                        </form></li>
-                    </ul>
-                </div>
-            </div>
-            <div class="navbar-center">
-                <p class="">PT Home</p>
+                        </form>
+                    </li>
+
+                </ul>
             </div>
         </div>
-
-        <div class="container mx-auto">
-            {% block content %}{% endblock %}
+        <div class="navbar-center">
+            <p class="">PT Home</p>
         </div>
-    </body>
-    <footer>
-        {% if user.is_authenticated %}
-        <ul class="list">
-            <a href="{% url 'home' %}" class="link list-row w-full">home</a>
-            <a href="{% url 'profile' %}" class="link list-row w-full">profile</a>
-            <form action="{% url 'logout' %}" method="POST">
-                {% csrf_token %}
-                <button type="submit" class="link list-row w-full">Logout</button>
-            </form>
-        </ul>
+    </div>
+    <div class="container mx-auto my-5">
+        {% block content %}{% endblock %}
+    </div>
+</body>
+<footer class="footer sm:footer-horizontal footer-center bg-base-200 text-base-content p-4">
+    <aside>
+        <p>PT Home -- Created and Maintained by Alex Szeliga</p>
+    </aside>
+</footer>
 
-        {% endif %}
-    </footer>
 </html>

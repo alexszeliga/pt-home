@@ -12,17 +12,33 @@ async function initMap() {
   const longitudeField = document.getElementById('id_longitude');
   const displayNameField = document.getElementById('id_display_name');
 
+  const resultsWrapper = document.getElementById('gmp-result');
+  const resultTemplate = document.getElementById('gmp-result-body');
+
+  const updateFormFields = (fields) => {
+    nameField.placeholder = fields.displayName;
+    addressField.value = fields.formattedAddress
+    placeIdField.value = fields.id
+    latitudeField.value = fields.location.lat.toFixed(6)
+    longitudeField.value = fields.location.lng.toFixed(6)
+    displayNameField.value = fields.displayName;
+  }
+
+  const updateResults = (fields) => {
+    const template = document.importNode(resultTemplate.content, true);
+    template.querySelector('#result_display_name').textContent = fields.displayName;
+    template.querySelector('#result_address').textContent = fields.formattedAddress;
+    template.querySelector('#result_coord').textContent = `${fields.location.lat.toFixed(6)} / ${fields.location.lng.toFixed(6)}`
+    resultsWrapper.replaceChildren(template);
+  }
+
   placeAutocomplete.addEventListener('gmp-select', async ({ placePrediction }) => {
       const place = placePrediction.toPlace();
 
       await place.fetchFields({ fields: ['displayName', 'formattedAddress', 'location'] });
       const fields = place.toJSON();
-      nameField.placeholder = fields.displayName;
-      addressField.value = fields.formattedAddress
-      placeIdField.value = fields.id
-      latitudeField.value = fields.location.lat.toFixed(6)
-      longitudeField.value = fields.location.lng.toFixed(6)
-      displayNameField.value = fields.displayName;
+      updateFormFields(fields);
+      updateResults(fields);
   });
 
   inputElm.addEventListener('click', (e) => {

@@ -6,30 +6,60 @@
 {% block title %}Add Location{% endblock %}
 
 {% block head_scripts %}
-    <script type="module" src="{% static 'users/autocomplete.js' %}"></script>
+<script type="module" src="{% static 'users/autocomplete.js' %}"></script>
 {% endblock %}
 
 {% block content %}
-    <form method="post">
-        {% csrf_token %}
-        {% for field in form.hidden_fields %}
-        {% render_field field %}
+<form method="post">
+    {% csrf_token %}
+    {% for field in form.hidden_fields %}
+    {% render_field field %}
+    {% endfor %}
+    {% for error in form.non_field_errors %}
+        <p class="text-error">{{ error }}</p>
+    {% endfor %}
+    <fieldset class="fieldset">
+        <label>Place Search:</label>
+        <div id="gmp-input"></div>
+    </fieldset>
+    {% for field in form.visible_fields %}
+    <fieldset class="fieldset">
+        {{ field.label_tag }}
+        {% render_field field class="input w-full" %}
+        {% for error in field.errors %}
+        <small class="text-danger">{{ error }}</small>
         {% endfor %}
-        {% for field in form.visible_fields %}
-        <fieldset class="fieldset">
-            {{ field.label_tag }}
-            {% render_field field class="input" %}
-            {% for error in field.errors %}
-            <small class="text-danger">{{ error }}</small>
-            {% endfor %}
-            <small class="form-text text-muted">{{ field.help_text }}</small>
-        </fieldset>
-        {% endfor %}
-        <button type="submit" class="btn">Add Location</button>
-    </form>
-    <div class="w-xs h-10"><div id="gmp-input"></div></div>
-    <div id="gmp-result"></div>
-    
-    <script>(g=>{var h,a,k,p="The Google Maps JavaScript API",c="google",l="importLibrary",q="__ib__",m=document,b=window;b=b[c]||(b[c]={});var d=b.maps||(b.maps={}),r=new Set,e=new URLSearchParams,u=()=>h||(h=new Promise(async(f,n)=>{await (a=m.createElement("script"));e.set("libraries",[...r]+"");for(k in g)e.set(k.replace(/[A-Z]/g,t=>"_"+t[0].toLowerCase()),g[k]);e.set("callback",c+".maps."+q);a.src=`https://maps.${c}apis.com/maps/api/js?`+e;d[q]=f;a.onerror=()=>h=n(Error(p+" could not load."));a.nonce=m.querySelector("script[nonce]")?.nonce||"";m.head.append(a)}));d[l]?console.warn(p+" only loads once. Ignoring:",g):d[l]=(f,...n)=>r.add(f)&&u().then(()=>d[l](f,...n))})
-        ({key: "{{ api_key }}", v: "weekly"});</script>
+        <small class="form-text text-muted">{{ field.help_text }}</small>
+    </fieldset>
+    {% endfor %}
+    <fieldset class="fieldset">
+        <div id="gmp-result-output">
+            <div id="gmp-result"></div>
+            <template id="gmp-result-body">
+                <div class="pb-3">
+                    <ul class="bg-base-200 list rounded-box shadow-md pb-2">
+                        <li class="p-4 pb-2 text-xs opacity-60 tracking-wide">Location Details</li>
+                        <li class="list-row">
+                            <div class="list-col-grow">
+                                <div class="text-xs uppercase font-semibold opacity-60">Display Name</div>
+                                <p id="result_display_name" class="list-col-wrap text-xs"></p>
+                            </div>
+                        </li>
+                        <li class="list-row">
+                            <div class="list-col-grow">
+                                <div class="text-xs uppercase font-semibold opacity-60">Coordinates ( lat / lng )</div>
+                                <p id="result_coord" class="list-col-wrap text-xs"></p>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </template>
+        </div>
+    </fieldset>
+    <button type="submit" class="btn">Add Location</button>
+</form>
+
+
+<script>(g => { var h, a, k, p = "The Google Maps JavaScript API", c = "google", l = "importLibrary", q = "__ib__", m = document, b = window; b = b[c] || (b[c] = {}); var d = b.maps || (b.maps = {}), r = new Set, e = new URLSearchParams, u = () => h || (h = new Promise(async (f, n) => { await (a = m.createElement("script")); e.set("libraries", [...r] + ""); for (k in g) e.set(k.replace(/[A-Z]/g, t => "_" + t[0].toLowerCase()), g[k]); e.set("callback", c + ".maps." + q); a.src = `https://maps.${c}apis.com/maps/api/js?` + e; d[q] = f; a.onerror = () => h = n(Error(p + " could not load.")); a.nonce = m.querySelector("script[nonce]")?.nonce || ""; m.head.append(a) })); d[l] ? console.warn(p + " only loads once. Ignoring:", g) : d[l] = (f, ...n) => r.add(f) && u().then(() => d[l](f, ...n)) })
+        ({ key: "{{ api_key }}", v: "weekly" });</script>
 {% endblock %}

@@ -4,6 +4,6 @@
 
 {% block content %}
 {% for userLocation in userLocations %}
-<p>{{ userLocation }}</p>
+<a href="{% url 'user.location'  user_location_id=userLocation.id %}">{{ userLocation.display_name }}</a>
 {% endfor %}
 {% endblock %}
