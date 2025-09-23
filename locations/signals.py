@@ -1,13 +1,18 @@
 from django.db.models.signals import post_save
 from django.contrib.gis.geos import Point
-from django.dispatch import receiver
+from django.dispatch import receiver, Signal
 from .models import UserLocation, SeptaLocation
 import requests
 
-@receiver(post_save, sender=UserLocation)
-def location_created_handler(sender, instance: UserLocation, created, **kwargs):
+
+
+# Define a custom signal that will pass the instance and form data
+user_location_form_saved = Signal()
+
+@receiver(user_location_form_saved, sender=UserLocation)
+def location_created_handler(sender, instance: UserLocation, form, created, **kwargs):
     if created:
-        septaResponse = requests.get(f"https://www3.septa.org/api/locations/get_locations.php?lat={instance.coords.y}&lon={instance.coords.x}&radius=0.25")
+        septaResponse = requests.get(f"https://www3.septa.org/api/locations/get_locations.php?lat={instance.coords.y}&lon={instance.coords.x}&radius={form.cleaned_data['walking_distance']}")
         if septaResponse.status_code == 200:
             locations = septaResponse.json()
             for location in locations:

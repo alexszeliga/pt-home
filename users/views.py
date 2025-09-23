@@ -5,12 +5,12 @@ from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
 from django.contrib.gis.geos import Point
 from django.shortcuts import render, redirect, get_object_or_404
 from . import forms
-from locations.models import Location, UserLocation
+from locations.models import Location, UserLocation, SeptaLocation
+from locations.signals import user_location_form_saved
 
 def register(request):
     if request.method == 'POST':
         form = UserCreationForm(request.POST)
-        print(type(form))
         if form.is_valid():
             form.save()
             return redirect('login') # Redirect to login page after successful registration
@@ -47,10 +47,12 @@ def location(request):
 
             point = Point(float(form.cleaned_data['longitude']), float(form.cleaned_data['latitude']))
 
-            UserLocation.objects.get_or_create(coords=point, defaults={
+            loc, created = UserLocation.objects.get_or_create(coords=point, defaults={
                 'user' : request.user,
                 'display_name': form.cleaned_data['name'] or form.cleaned_data['display_name'],
             })
+
+            user_location_form_saved.send(sender=UserLocation, instance=loc, form=form, created=created)
 
             return redirect('user.locations')
         else:
@@ -67,10 +69,18 @@ def locations(request):
 def location_single(request, user_location_id):
     user_locations = UserLocation.objects.filter(user=request.user).select_related('user', 'location_ptr')
     user_location = get_object_or_404(user_locations, pk=user_location_id)
+
+    if request.method == "GET":
+        form = forms.DefaultSeptaLocationForm(initial={'default_septa_location': user_location.default_septa_location.id})
+        return render(request, 'users/location_single.html', {'userLocation':user_location,'api_key': os.getenv('GOOGLE_MAPS_PLACES_API_KEY'), 'default_septa_location_form': form})
+
     if request.method == 'POST':
-        user_location.delete()
-        return redirect('user.locations')
-    return render(request, 'users/location_single.html', {'userLocation':user_location,'api_key': os.getenv('GOOGLE_MAPS_PLACES_API_KEY')})
+        form = forms.DefaultSeptaLocationForm(request.POST)
+        if form.is_valid():
+            septaLocation = form.cleaned_data['default_septa_location']
+            user_location.default_septa_location = septaLocation
+            user_location.save()
+    return render(request, 'users/location_single.html', {'userLocation':user_location,'api_key': os.getenv('GOOGLE_MAPS_PLACES_API_KEY'), 'default_septa_location_form': form})
 
 @login_required
 def location_single_delete(request, user_location_id):
