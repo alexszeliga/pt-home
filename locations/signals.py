@@ -1,7 +1,8 @@
 from django.db.models.signals import post_save
 from django.contrib.gis.geos import Point
 from django.dispatch import receiver, Signal
-from .models import UserLocation, SeptaLocation
+from users.models import UserLocation
+from septa.models import SeptaLocation
 import requests
 
 

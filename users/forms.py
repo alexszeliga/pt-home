@@ -1,6 +1,8 @@
 from django import forms
 from django.contrib.gis.geos import Point
-from locations.models import Location, UserLocation, SeptaLocation
+from septa.models import SeptaLocation
+from users.models import UserLocation
+
 from django.core.exceptions import ValidationError
 
 class LocationForm(forms.Form):

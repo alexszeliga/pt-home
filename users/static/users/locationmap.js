@@ -1,4 +1,9 @@
 let map;
+let styles = getComputedStyle(document.documentElement);
+const primaryColor = styles.getPropertyValue('--color-primary')
+const accentColor = styles.getPropertyValue('--color-secondary')
+const primaryColorB = styles.getPropertyValue('--color-primary-content')
+const accentColorB = styles.getPropertyValue('--color-secondary-content')
 
 async function initMap() {
     const addressData = document.querySelector('#address-data').dataset
@@ -21,10 +26,10 @@ async function initMap() {
     });
     septaData.forEach((location) => {
         const pin = new PinElement({
-            background: '#FF0000',
-            borderColor: '#0000FF',
-            glyphColor: '#FFFFFF',
-            scale: 0.5
+            background: location.is_default ? primaryColor : accentColor,
+            borderColor: location.is_default ? primaryColorB : accentColorB,
+            glyphColor: location.is_default ? primaryColorB : accentColorB,
+            scale: 0.8
         })
         const position = {lat: parseFloat(location.lat), lng: parseFloat(location.lng)}
         new AdvancedMarkerElement({

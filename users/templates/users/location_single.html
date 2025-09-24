@@ -13,7 +13,17 @@
 {% block content %}
 <div hidden aria-hidden id="address-data" data-lat="{{userLocation.coords.y}}" data-lng="{{userLocation.coords.x}}" data-name="{{ userLocation.display_name }}">
     {% for septaLocation in userLocation.septa_locations.all %}
-    <div hidden aria-hidden id="septa_location_{{ septaLocation.location_id }}" data-name="{{ septaLocation.location_name }}" data-type="{{ septaLocation.location_type }}" data-lat="{{ septaLocation.coords.y }}" data-lng="{{ septaLocation.coords.x }}" ></div>
+        <div 
+            hidden
+            aria-hidden id="septa_location_{{ septaLocation.location_id }}"
+            data-name="{{ septaLocation.location_name }}"
+            data-type="{{ septaLocation.location_type }}"
+            data-lat="{{ septaLocation.coords.y }}"
+            data-lng="{{ septaLocation.coords.x }}" 
+            {% if septaLocation.id == userLocation.default_septa_location.id %}
+            data-is_default="true"
+            {% endif %}
+            ></div>
     {% endfor %}
 </div>
 <h1 class="text-3xl font-light">{{ userLocation.display_name }}</h1>

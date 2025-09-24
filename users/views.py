@@ -5,7 +5,7 @@ from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
 from django.contrib.gis.geos import Point
 from django.shortcuts import render, redirect, get_object_or_404
 from . import forms
-from locations.models import Location, UserLocation, SeptaLocation
+from users.models import UserLocation
 from locations.signals import user_location_form_saved
 
 def register(request):
@@ -71,7 +71,7 @@ def location_single(request, user_location_id):
     user_location = get_object_or_404(user_locations, pk=user_location_id)
 
     if request.method == "GET":
-        form = forms.DefaultSeptaLocationForm(initial={'default_septa_location': user_location.default_septa_location.id})
+        form = forms.DefaultSeptaLocationForm(initial={'default_septa_location': user_location.default_septa_location})
         return render(request, 'users/location_single.html', {'userLocation':user_location,'api_key': os.getenv('GOOGLE_MAPS_PLACES_API_KEY'), 'default_septa_location_form': form})
 
     if request.method == 'POST':
