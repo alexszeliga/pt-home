@@ -48,7 +48,7 @@ INSTALLED_APPS = [
     'theme',
     'widget_tweaks',
     'locations',
-    'septa',
+    'agency',
 ]
 
 if DEBUG:

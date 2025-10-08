@@ -3,10 +3,12 @@ from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
 from django.contrib.gis.geos import Point
+from django.contrib.gis.measure import D
+from django.contrib.gis.db.models.functions import Distance
 from django.shortcuts import render, redirect, get_object_or_404
 from . import forms
 from users.models import UserLocation
-from locations.signals import user_location_form_saved
+from agency.models import Stop
 
 def register(request):
     if request.method == 'POST':
@@ -47,12 +49,16 @@ def location(request):
 
             point = Point(float(form.cleaned_data['longitude']), float(form.cleaned_data['latitude']))
 
-            loc, created = UserLocation.objects.get_or_create(coords=point, defaults={
+            loc, _created = UserLocation.objects.get_or_create(coords=point, defaults={
                 'user' : request.user,
                 'display_name': form.cleaned_data['name'] or form.cleaned_data['display_name'],
             })
 
-            user_location_form_saved.send(sender=UserLocation, instance=loc, form=form, created=created)
+            distance = D(mi=float(form.cleaned_data['walking_distance']))
+
+            stops = Stop.objects.filter(coords__dwithin=(point, distance))
+
+            loc.stops.add(*stops)
 
             return redirect('user.locations')
         else:
@@ -71,14 +77,14 @@ def location_single(request, user_location_id):
     user_location = get_object_or_404(user_locations, pk=user_location_id)
 
     if request.method == "GET":
-        form = forms.DefaultSeptaLocationForm(initial={'default_septa_location': user_location.default_septa_location})
+        form = forms.DefaultSeptaLocationForm(initial={'default_septa_location': user_location.default_stop},queryset=user_location.stops)
         return render(request, 'users/location_single.html', {'userLocation':user_location,'api_key': os.getenv('GOOGLE_MAPS_PLACES_API_KEY'), 'default_septa_location_form': form})
 
     if request.method == 'POST':
-        form = forms.DefaultSeptaLocationForm(request.POST)
+        form = forms.DefaultSeptaLocationForm(request.POST, queryset=user_location.stops)
         if form.is_valid():
             septaLocation = form.cleaned_data['default_septa_location']
-            user_location.default_septa_location = septaLocation
+            user_location.default_stop = septaLocation
             user_location.save()
     return render(request, 'users/location_single.html', {'userLocation':user_location,'api_key': os.getenv('GOOGLE_MAPS_PLACES_API_KEY'), 'default_septa_location_form': form})
 

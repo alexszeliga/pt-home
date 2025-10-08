@@ -1,6 +1,6 @@
 from django import forms
 from django.contrib.gis.geos import Point
-from septa.models import SeptaLocation
+from agency.models import Stop
 from users.models import UserLocation
 
 from django.core.exceptions import ValidationError
@@ -37,4 +37,9 @@ class LocationForm(forms.Form):
         return cleaned_data
 
 class DefaultSeptaLocationForm(forms.Form):
-    default_septa_location = forms.ModelChoiceField(SeptaLocation.objects.all())
+    default_septa_location = forms.ModelChoiceField(Stop.objects.none())
+    def __init__(self, *args, **kwargs):
+        self.queryset = kwargs.pop('queryset', None) 
+        super().__init__(*args, **kwargs)
+        self.fields['default_septa_location'].queryset = self.queryset
+    

@@ -12,15 +12,15 @@
 
 {% block content %}
 <div hidden aria-hidden id="address-data" data-lat="{{userLocation.coords.y}}" data-lng="{{userLocation.coords.x}}" data-name="{{ userLocation.display_name }}">
-    {% for septaLocation in userLocation.septa_locations.all %}
+    {% for stop in userLocation.stops.all %}
         <div 
             hidden
-            aria-hidden id="septa_location_{{ septaLocation.location_id }}"
-            data-name="{{ septaLocation.location_name }}"
-            data-type="{{ septaLocation.location_type }}"
-            data-lat="{{ septaLocation.coords.y }}"
-            data-lng="{{ septaLocation.coords.x }}" 
-            {% if septaLocation.id == userLocation.default_septa_location.id %}
+            aria-hidden id="stop_{{ stop.stop_id }}"
+            data-name="{{ stop.stop_name }}"
+            data-type="{{ stop.stop_type }}"
+            data-lat="{{ stop.coords.y }}"
+            data-lng="{{ stop.coords.x }}" 
+            {% if stop.id == userLocation.default_stop.id %}
             data-is_default="true"
             {% endif %}
             ></div>

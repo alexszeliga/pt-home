@@ -7,7 +7,7 @@ const accentColorB = styles.getPropertyValue('--color-secondary-content')
 
 async function initMap() {
     const addressData = document.querySelector('#address-data').dataset
-    const septaData = [...document.querySelectorAll('[id^="septa_location_"]')].map((node)=>node.dataset)
+    const septaData = [...document.querySelectorAll('[id^="stop_"]')].map((node)=>node.dataset)
     const position = { lat: parseFloat(addressData.lat) ?? -25.344, lng: parseFloat(addressData.lng) ?? 131.031 };
     const { Map } = await google.maps.importLibrary("maps");
     const { AdvancedMarkerElement, PinElement } = await google.maps.importLibrary("marker");
