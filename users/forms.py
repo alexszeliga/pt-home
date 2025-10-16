@@ -1,6 +1,6 @@
 from django import forms
 from django.contrib.gis.geos import Point
-from agency.models import Stop
+from agency.models import Stop, Route
 from users.models import UserLocation
 
 from django.core.exceptions import ValidationError
@@ -37,9 +37,20 @@ class LocationForm(forms.Form):
         return cleaned_data
 
 class DefaultSeptaLocationForm(forms.Form):
-    default_septa_location = forms.ModelChoiceField(Stop.objects.none())
+    default_septa_location = forms.ModelChoiceField(Stop.objects.none(), required=False)
+    walking_choices = [
+        ('0.10', '1/10 miles (about a block)'),
+        ('0.25', '1/4 mile (2.5 blocks)'),
+        ('0.50', 'Half mile (~5 blocks)'),
+        ('1.00', '1 mile (~9 blocks)'),
+    ]
+    walking_distance = forms.ChoiceField(choices=walking_choices)
+    route = forms.ModelChoiceField(Route.objects.none(), required=False)
     def __init__(self, *args, **kwargs):
-        self.queryset = kwargs.pop('queryset', None) 
+        self.stop_queryset = kwargs.pop('stop_queryset', None) 
+        self.route_queryset = kwargs.pop('route_queryset', None)
+        self.walking_distance_initial = kwargs.pop('walking_distance_initial', None)
         super().__init__(*args, **kwargs)
-        self.fields['default_septa_location'].queryset = self.queryset
-    
+        self.fields['default_septa_location'].queryset = self.stop_queryset 
+        self.fields['route'].queryset = self.route_queryset
+        self.fields['walking_distance'].initial = self.walking_distance_initial

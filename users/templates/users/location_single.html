@@ -12,11 +12,12 @@
 
 {% block content %}
 <div hidden aria-hidden id="address-data" data-lat="{{userLocation.coords.y}}" data-lng="{{userLocation.coords.x}}" data-name="{{ userLocation.display_name }}">
-    {% for stop in userLocation.stops.all %}
+    {% for stop in route_stops %}
         <div 
             hidden
             aria-hidden id="stop_{{ stop.stop_id }}"
             data-name="{{ stop.stop_name }}"
+            data-id="{{ stop.stop_id }}"
             data-type="{{ stop.stop_type }}"
             data-lat="{{ stop.coords.y }}"
             data-lng="{{ stop.coords.x }}" 
@@ -29,9 +30,8 @@
 <h1 class="text-3xl font-light">{{ userLocation.display_name }}</h1>
 <form action="" method="post">
     {% csrf_token %}
-    {% for field in default_septa_location_form.visible_fields %}
-    {% render_field field class="input w-full" %}
-    {% endfor %}
+    {% render_field location_form.route class="input w-full" %}
+    {% render_field location_form.walking_distance class="input w-full" %}
     <button class="btn" type="submit">Update Location</button>
 </form>
 <form action="{% url 'user.location.delete' user_location_id=userLocation.id %}" method="POST">

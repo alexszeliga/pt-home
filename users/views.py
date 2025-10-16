@@ -8,7 +8,7 @@ from django.contrib.gis.db.models.functions import Distance
 from django.shortcuts import render, redirect, get_object_or_404
 from . import forms
 from users.models import UserLocation
-from agency.models import Stop
+from agency.models import Route, Stop, StopTime, Trip
 
 def register(request):
     if request.method == 'POST':
@@ -49,18 +49,12 @@ def location(request):
 
             point = Point(float(form.cleaned_data['longitude']), float(form.cleaned_data['latitude']))
 
-            loc, _created = UserLocation.objects.get_or_create(coords=point, defaults={
+            location, created = UserLocation.objects.get_or_create(coords=point, defaults={
                 'user' : request.user,
                 'display_name': form.cleaned_data['name'] or form.cleaned_data['display_name'],
+                'walking_distance': float(form.cleaned_data['walking_distance']),
             })
-
-            distance = D(mi=float(form.cleaned_data['walking_distance']))
-
-            stops = Stop.objects.filter(coords__dwithin=(point, distance))
-
-            loc.stops.add(*stops)
-
-            return redirect('user.locations')
+            return redirect('user.location', user_location_id=location.id)
         else:
             return render(request, 'users/location.html', {'user': request.user, 'form': form, 'api_key': os.getenv('GOOGLE_MAPS_PLACES_API_KEY')})
     form = forms.LocationForm(user=request.user)
@@ -75,18 +69,58 @@ def locations(request):
 def location_single(request, user_location_id):
     user_locations = UserLocation.objects.filter(user=request.user).select_related('user', 'location_ptr')
     user_location = get_object_or_404(user_locations, pk=user_location_id)
-
+    distance = D(mi=user_location.walking_distance)
+    stops = Stop.objects.filter(coords__dwithin=(user_location.coords, distance))
+    unique_routes = Route.objects.filter(trip__stoptime__stop__in=stops).distinct()
+    route_stops = stops.filter(stoptime__trip__route=user_location.route).distinct()
+    print(str(user_location.walking_distance))
     if request.method == "GET":
-        form = forms.DefaultSeptaLocationForm(initial={'default_septa_location': user_location.default_stop},queryset=user_location.stops)
-        return render(request, 'users/location_single.html', {'userLocation':user_location,'api_key': os.getenv('GOOGLE_MAPS_PLACES_API_KEY'), 'default_septa_location_form': form})
+        location_form = forms.DefaultSeptaLocationForm(
+            initial={'route': user_location.route},
+            stop_queryset=stops,
+            route_queryset=unique_routes,
+            walking_distance_initial=str(user_location.walking_distance)
+
+        )
+        return render(request, 'users/location_single.html', {
+            'userLocation':user_location,
+            'api_key': os.getenv('GOOGLE_MAPS_PLACES_API_KEY'),
+            'location_form': location_form,
+            'routes': unique_routes,
+            'route_stops': route_stops
+        })
 
     if request.method == 'POST':
-        form = forms.DefaultSeptaLocationForm(request.POST, queryset=user_location.stops)
-        if form.is_valid():
-            septaLocation = form.cleaned_data['default_septa_location']
-            user_location.default_stop = septaLocation
-            user_location.save()
-    return render(request, 'users/location_single.html', {'userLocation':user_location,'api_key': os.getenv('GOOGLE_MAPS_PLACES_API_KEY'), 'default_septa_location_form': form})
+        distance = D(mi=float(request.POST['walking_distance']))
+        stops = Stop.objects.filter(coords__dwithin=(user_location.coords, distance))
+        unique_routes = Route.objects.filter(trip__stoptime__stop__in=stops).distinct()
+        route_stops = stops.filter(stoptime__trip__route=user_location.route).distinct()
+
+        location_form = forms.DefaultSeptaLocationForm(
+            request.POST,
+            initial={'route': user_location.route},
+            stop_queryset=stops,
+            route_queryset=unique_routes,
+            walking_distance_initial=str(user_location.walking_distance)
+        )
+        if location_form.is_valid():
+            default_stop = location_form.cleaned_data['default_septa_location']
+            location_route = location_form.cleaned_data['route']
+            walking_distance = float(location_form.cleaned_data['walking_distance'])
+            user_location.walking_distance = walking_distance
+            if location_route:
+                user_location.route = location_route
+            if default_stop:
+                user_location.default_stop = default_stop
+            user_location.save()    
+
+    return render(request, 'users/location_single.html', {
+        'userLocation':user_location,
+        'api_key': os.getenv('GOOGLE_MAPS_PLACES_API_KEY'),
+        'location_form': location_form,
+        'routes':unique_routes,
+        'route_stops': route_stops
+    })
 
 @login_required
 def location_single_delete(request, user_location_id):

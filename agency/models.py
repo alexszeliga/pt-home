@@ -93,6 +93,10 @@ class StopTime(models.Model):
         # Each stop can only be visited once per trip.
         unique_together = ('trip', 'stop_sequence')
         ordering = ['trip', 'stop_sequence']
+        indexes = [
+            models.Index(fields=['trip', 'stop_sequence'], name='trip_sequence_idx'),
+            models.Index(fields=['stop'], name='stop_idx')
+        ]
 
     def __str__(self):
         return f"{self.stop.stop_name} @ {self.arrival_time} on {self.trip.trip_id}"
